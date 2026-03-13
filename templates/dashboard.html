@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>CyberSentinel</title>
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>CyberSentinel</h2>
+
+<a href="/">Dashboard</a>
+<a href="/threats">Threat Intelligence</a>
+<a href="/analytics">Attack Analytics</a>
+
+</div>
+
+<div class="main">
+
+<h1>Security Dashboard</h1>
+
+<div class="card">
+
+Normal: <span id="normal">{{normal_count}}</span> |
+Suspicious: <span id="suspicious">{{suspicious_count}}</span> |
+High Risk: <span id="risk">{{high_risk_count}}</span>
+
+</div>
+
+<div class="card">
+
+<h3>Live Security Feed</h3>
+<div id="feed"></div>
+
+</div>
+
+<table id="logTable">
+
+<tr>
+<th>User</th>
+<th>Role</th>
+<th>Time</th>
+<th>Region</th>
+<th>Failed</th>
+<th>Files</th>
+<th>Risk</th>
+<th>Status</th>
+</tr>
+
+</table>
+
+</div>
+
+<script>
+
+async function updateLogs(){
+
+const res = await fetch("/api/logs")
+const data = await res.json()
+
+document.getElementById("normal").innerText=data.normal
+document.getElementById("suspicious").innerText=data.suspicious
+document.getElementById("risk").innerText=data.risk
+
+const table=document.getElementById("logTable")
+
+table.innerHTML=`
+<tr>
+<th>User</th>
+<th>Role</th>
+<th>Time</th>
+<th>Region</th>
+<th>Failed</th>
+<th>Files</th>
+<th>Risk</th>
+<th>Status</th>
+</tr>
+`
+
+const feed=document.getElementById("feed")
+feed.innerHTML=""
+
+data.logs.forEach(log=>{
+
+table.innerHTML+=`
+<tr>
+<td>${log.user_id}</td>
+<td>${log.role}</td>
+<td>${log.login_time}</td>
+<td>${log.ip_region}</td>
+<td>${log.failed_attempts}</td>
+<td>${log.files_accessed}</td>
+<td>${log.risk_score}</td>
+<td>${log.status}</td>
+</tr>
+`
+
+feed.innerHTML+=`
+<div>[${log.login_time}] ${log.user_id} → ${log.status} (Risk ${log.risk_score})</div>
+`
+
+})
+
+}
+
+setInterval(updateLogs,2000)
+
+updateLogs()
+
+</script>
+
+</body>
+</html>

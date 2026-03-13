@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Threat Intelligence</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>CyberSentinel</h2>
+
+<a href="/">Dashboard</a>
+<a href="/threats">Threat Intelligence</a>
+<a href="/analytics">Attack Analytics</a>
+
+</div>
+
+<div class="main">
+
+<h1>Threat Intelligence</h1>
+
+<div class="card">
+
+<table>
+
+<tr>
+<th>User</th>
+<th>Region</th>
+<th>Failed Attempts</th>
+<th>Files Accessed</th>
+<th>Threat Type</th>
+<th>Severity</th>
+</tr>
+
+{% for log in logs %}
+
+{% if log.status != "Normal" %}
+
+<tr>
+
+<td>{{log.user_id}}</td>
+<td>{{log.ip_region}}</td>
+<td>{{log.failed_attempts}}</td>
+<td>{{log.files_accessed}}</td>
+
+<td>
+
+{% if log.failed_attempts > 5 %}
+Brute Force Attempt
+{% elif log.files_accessed > 200 %}
+Data Exfiltration
+{% else %}
+Account Misuse
+{% endif %}
+
+</td>
+
+<td>
+
+<span class="badge
+{% if log.status == 'High Risk' %}danger
+{% else %}suspicious
+{% endif %}">
+
+{{log.status}}
+
+</span>
+
+</td>
+
+</tr>
+
+{% endif %}
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>

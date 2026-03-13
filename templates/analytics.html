@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Attack Analytics</title>
+<link rel="stylesheet" href="/static/style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>CyberSentinel</h2>
+
+<a href="/">Dashboard</a>
+<a href="/threats">Threat Intelligence</a>
+<a href="/analytics">Attack Analytics</a>
+
+</div>
+
+<div class="main">
+
+<h1>Attack Analytics</h1>
+
+<div class="card">
+
+<canvas id="riskChart"></canvas>
+
+</div>
+
+<div class="card">
+
+<canvas id="regionChart"></canvas>
+
+</div>
+
+</div>
+
+<script>
+
+const logs = {{ logs | tojson }};
+
+let times=[]
+let scores=[]
+let regions={}
+
+logs.forEach(log=>{
+
+times.push(log.login_time)
+scores.push(log.risk_score)
+
+if(regions[log.ip_region]){
+regions[log.ip_region]+=1
+}else{
+regions[log.ip_region]=1
+}
+
+})
+
+new Chart(document.getElementById("riskChart"),{
+
+type:"line",
+
+data:{
+labels:times,
+datasets:[{
+label:"Risk Score Trend",
+data:scores,
+borderColor:"red",
+fill:false
+}]
+}
+
+})
+
+new Chart(document.getElementById("regionChart"),{
+
+type:"bar",
+
+data:{
+labels:Object.keys(regions),
+datasets:[{
+label:"Attack Distribution",
+data:Object.values(regions),
+backgroundColor:"orange"
+}]
+}
+
+})
+
+</script>
+
+</body>
+</html>
